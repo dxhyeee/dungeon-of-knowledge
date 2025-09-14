@@ -6,7 +6,6 @@ const urlsToCache = [
   './index.css',
   './index.tsx',
   './manifest.json',
-  './capacitor.config.ts',
   'https://assets.aistudio.dev/projects/template/192x192.png'
 ];
 

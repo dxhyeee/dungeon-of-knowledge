@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleGenAI, Chat } from '@google/genai';
@@ -846,6 +847,15 @@ const App = () => {
       }
     };
     init();
+
+    // 서비스 워커 등록
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(registration => console.log('Service Worker registered:', registration))
+          .catch(error => console.log('Service Worker registration failed:', error));
+      });
+    }
 
     pb.collection('profiles').subscribe<Profile>('*', (e) => setProfiles(prev => e.action === 'delete' ? prev.filter(p => p.id !== e.record.id) : [...prev.filter(p => p.id !== e.record.id), e.record]));
     pb.collection('classes').subscribe<Class>('*', (e) => setClasses(prev => e.action === 'delete' ? prev.filter(c => c.id !== e.record.id) : [...prev.filter(c => c.id !== e.record.id), e.record]));
