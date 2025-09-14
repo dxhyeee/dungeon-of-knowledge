@@ -1,0 +1,27 @@
+{
+  "name": "지식의 던전",
+  "short_name": "지식의 던전",
+  "description": "공부 시간을 기록하고 반별 순위표에서 경쟁하는 웹 애플리케이션입니다.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#6a11cb",
+  "icons": [
+    {
+      "src": "https://assets.aistudio.dev/projects/template/192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://assets.aistudio.dev/projects/template/256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "https://assets.aistudio.dev/projects/template/512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

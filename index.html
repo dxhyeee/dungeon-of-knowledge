@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>지식의 던전</title>
+    <base href="./" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gugi&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css" />
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@18.2.0",
+    "react/": "https://aistudiocdn.com/react@18.2.0/",
+    "react/jsx-runtime": "https://aistudiocdn.com/react@18.2.0/jsx-runtime",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@18.2.0/client",
+    "react-dom/": "https://aistudiocdn.com/react-dom@18.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@1.19.0",
+    "pocketbase": "https://aistudiocdn.com/pocketbase@0.21.3"
+  }
+}
+</script>
+    <!-- Vercel 배포 시 API 키를 주입하기 위한 스크립트 -->
+    <script>
+      window.process = { env: { API_KEY: "%%GOOGLE_API_KEY%%" } };
+    </script>
+    <!-- Babel Standalone for in-browser TSX/JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#6a11cb">
+    <link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root">앱을 불러오는 중입니다... 잠시만 기다려주세요.</div>
+    <script type="text/babel" data-type="module" data-presets="react,typescript" src="index.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
