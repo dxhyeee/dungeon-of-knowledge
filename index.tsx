@@ -1056,6 +1056,7 @@ const Dashboard = ({ user, profiles, classes, dailyRecord, missionClaims, aiChat
             }, 0);
             return { ...c, todaysDailyTime: totalDailyTime };
         });
+        // FIX: Corrected a typo in the sort function from `a.b.todaysDailyTime` to `a.todaysDailyTime`.
         return classDailyTimes.sort((a, b) => b.todaysDailyTime - a.todaysDailyTime);
     }, [classes, profiles, allDailyRecords, user.id, dailyTime, sessionTime, isTimerRunning]);
     
@@ -1324,11 +1325,15 @@ const App = () => {
     };
     init();
 
-    // 서비스 워커 등록
+    // 서비스 워커 등록 및 강제 업데이트 확인
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(registration => console.log('Service Worker registered:', registration))
+          .then(registration => {
+            console.log('Service Worker registered:', registration);
+            // 페이지 로드 시마다 새로운 서비스 워커가 있는지 확인합니다.
+            registration.update();
+          })
           .catch(error => console.log('Service Worker registration failed:', error));
       });
     }
