@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleGenAI, Chat } from '@google/genai';
@@ -134,11 +135,6 @@ const getCharacterForLevel = (theme: string, level: number): string => {
 const getTodayDateString = (): string => {
     const today = new Date();
     return `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
-};
-
-const toPocketBaseDateTime = (date: Date): string => {
-    const pad = (n: number) => n.toString().padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
 };
 
 const formatClassName = (school: string, grade: string, classId: number): string => {
@@ -392,7 +388,7 @@ const ClassDetailView = ({ user, classData, profiles, onBack, onUpdateProfile, .
             monday.setDate(today.getDate() - diffToMonday);
             monday.setHours(0,0,0,0);
             
-            const filter = `(${classMembers.map(m => `user = "${m.id}"`).join(' || ')}) && date >= "${toPocketBaseDateTime(monday)}"`;
+            const filter = `(${classMembers.map(m => `user = "${m.id}"`).join(' || ')}) && date >= "${monday.toISOString()}"`;
             const allWeeklyRecords = await pb.collection('daily_records').getFullList<DailyRecord>({ filter });
 
             const localTodayStart = new Date();
@@ -576,8 +572,9 @@ const StudyCalendar = ({ user, onBack }: { user: Profile; onBack: () => void; })
             const month = currentDate.getMonth();
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
+            lastDay.setHours(23, 59, 59, 999);
 
-            const filter = `user = "${user.id}" && date >= "${toPocketBaseDateTime(firstDay)}" && date <= "${toPocketBaseDateTime(lastDay)}"`;
+            const filter = `user = "${user.id}" && date >= "${firstDay.toISOString()}" && date <= "${lastDay.toISOString()}"`;
             
             try {
                 const dailyRecords = await pb.collection('daily_records').getFullList<DailyRecord>({ filter });
@@ -1009,7 +1006,7 @@ const Dashboard = ({ user, profiles, classes, dailyRecord, missionClaims, aiChat
                 
                 try {
                     const records = await pb.collection('daily_records').getFullList<DailyRecord>({
-                        filter: `user = "${user.id}" && date >= "${toPocketBaseDateTime(monday)}"`
+                        filter: `user = "${user.id}" && date >= "${monday.toISOString()}"`
                     });
                     const total = records.reduce((sum, record) => sum + record.dailyTime, 0);
                     setWeeklyTotalTime(total);
@@ -1217,12 +1214,12 @@ const App = () => {
       localTodayStart.setHours(0, 0, 0, 0);
       const localTodayEnd = new Date();
       localTodayEnd.setHours(23, 59, 59, 999);
-      const todayRecordFilter = `user = "${loggedInUser.id}" && date >= "${toPocketBaseDateTime(localTodayStart)}" && date <= "${toPocketBaseDateTime(localTodayEnd)}"`;
+      const todayRecordFilter = `user = "${loggedInUser.id}" && date >= "${localTodayStart.toISOString()}" && date <= "${localTodayEnd.toISOString()}"`;
 
       try {
           const [recordRes, claimsRes, chatRes] = await Promise.all([
               pb.collection('daily_records').getList<DailyRecord>(1, 1, { filter: todayRecordFilter }),
-              pb.collection('mission_claims').getFullList<MissionClaim>({ filter: `user = "${loggedInUser.id}" && date >= "${toPocketBaseDateTime(monday)}"` }),
+              pb.collection('mission_claims').getFullList<MissionClaim>({ filter: `user = "${loggedInUser.id}" && date >= "${monday.toISOString()}"` }),
               pb.collection('ai_chats').getList<AIChat>(1, 1, { filter: `user = "${loggedInUser.id}"` })
           ]);
           setDailyRecord(recordRes.items[0] || null);
@@ -1253,7 +1250,7 @@ const App = () => {
         localTodayStart.setHours(0, 0, 0, 0);
         const localTodayEnd = new Date();
         localTodayEnd.setHours(23, 59, 59, 999);
-        const dailyRecordsFilter = `date >= "${toPocketBaseDateTime(localTodayStart)}" && date <= "${toPocketBaseDateTime(localTodayEnd)}"`;
+        const dailyRecordsFilter = `date >= "${localTodayStart.toISOString()}" && date <= "${localTodayEnd.toISOString()}"`;
         
         let [profilesRes, classesRes, dailyRecordsRes, postsRes] = await Promise.all([
           pb.collection('profiles').getFullList<Profile>(),
