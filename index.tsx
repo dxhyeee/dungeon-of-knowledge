@@ -1210,7 +1210,7 @@ const App = () => {
       
       try {
           const [recordRes, claimsRes, chatRes] = await Promise.all([
-              pb.collection('daily_records').getList<DailyRecord>(1, 1, { filter: `user = "${loggedInUser.id}" && date = "${todayStr}"` }),
+              pb.collection('daily_records').getList<DailyRecord>(1, 1, { filter: `user = "${loggedInUser.id}" && date ~ "${todayStr}"` }),
               pb.collection('mission_claims').getFullList<MissionClaim>({ filter: `user = "${loggedInUser.id}" && date >= "${mondayStr}"` }),
               pb.collection('ai_chats').getList<AIChat>(1, 1, { filter: `user = "${loggedInUser.id}"` })
           ]);
@@ -1241,7 +1241,7 @@ const App = () => {
         let [profilesRes, classesRes, dailyRecordsRes, postsRes] = await Promise.all([
           pb.collection('profiles').getFullList<Profile>(),
           pb.collection('classes').getFullList<Class>(),
-          pb.collection('daily_records').getFullList<DailyRecord>({ filter: `date = "${today}"` }),
+          pb.collection('daily_records').getFullList<DailyRecord>({ filter: `date ~ "${today}"` }),
           pb.collection('community_posts').getFullList<CommunityPost>({ sort: '-created' })
         ]);
         
@@ -1301,11 +1301,15 @@ const App = () => {
     };
     init();
 
-    // 서비스 워커 등록
+    // 서비스 워커 등록 및 강제 업데이트
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(registration => console.log('Service Worker registered:', registration))
+          .then(registration => {
+            console.log('Service Worker registered:', registration);
+            // 끈질긴 캐시 문제를 해결하기 위해 앱 로드 시마다 업데이트를 확인합니다.
+            registration.update();
+          })
           .catch(error => console.log('Service Worker registration failed:', error));
       });
     }
@@ -1460,7 +1464,7 @@ const App = () => {
               const updatedRecord = await pb.collection('daily_records').update<DailyRecord>(dailyRecord.id, updates);
               setDailyRecord(updatedRecord);
           } else {
-              const newRecordData = { user: user.id, date: today, dailyTime: 0, maxSessionTime: 0, morningStudyTime: 0, nightStudyTime: 0, ...updates };
+              const newRecordData = { user: user.id, date: new Date().toISOString(), dailyTime: 0, maxSessionTime: 0, morningStudyTime: 0, nightStudyTime: 0, ...updates };
               const newRecord = await pb.collection('daily_records').create<DailyRecord>(newRecordData);
               setDailyRecord(newRecord);
           }
@@ -1526,7 +1530,7 @@ const App = () => {
   };
 
   const renderPage = () => {
-    if (isLoading) return <Loader />;
+    if (isLoading) return null; // Let the initial HTML loader handle it
     if (error === "api_rules_error") return <ErrorDisplay message="API 규칙(권한) 설정에 문제가 있습니다." details="PocketBase 관리자 페이지에서 'profiles', 'classes' 등 직접 만드신 Collection들의 API Rules가 모두 비어있는지(Superusers only가 아닌지) 다시 한번 확인해주세요." />;
     if (error === "db_setup_incomplete") return <ErrorDisplay message="데이터베이스 설정이 완료되지 않았습니다." details={<>PocketBase 관리자 페이지에 접속하여 'profiles', 'classes', 'community_posts' 등의 Collection이 정확하게 생성되었는지 확인해주세요. <a href={`${POCKETBASE_URL}/_/`} target="_blank" rel="noopener noreferrer">여기를 클릭하여 관리자 페이지로 이동</a></>} />;
     if (error === "network_error") return <ErrorDisplay message="서버에 연결할 수 없습니다." details="인터넷 연결을 확인하거나, PocketBase 서버 주소가 정확한지 확인해주세요." />;
