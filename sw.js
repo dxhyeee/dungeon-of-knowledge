@@ -1,5 +1,5 @@
 // 서비스 워커 버전 및 캐시할 파일 목록 정의
-const CACHE_NAME = 'dungeon-of-knowledge-cache-v2';
+const CACHE_NAME = 'dungeon-of-knowledge-cache-v3';
 const urlsToCache = [
   './',
   './index.html',
@@ -10,7 +10,8 @@ const urlsToCache = [
 ];
 
 // 1. 서비스 워커 설치 (Install)
-// 앱이 처음 로드될 때 실행되어 핵심 파일들을 캐시에 저장합니다.
+// 앱이 처음 로드될 때 실행되어 핵심 파일들을 캐시에 저장하고,
+// 즉시 활성화되도록 합니다.
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -19,6 +20,7 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting(); // 새로운 서비스 워커를 즉시 활성화합니다.
 });
 
 // 2. 요청 가로채기 (Fetch) - 네트워크 우선 전략
@@ -52,8 +54,8 @@ self.addEventListener('fetch', event => {
 
 
 // 3. 서비스 워커 활성화 (Activate)
-// 새로운 버전의 서비스 워커가 설치되면,
-// 이전 버전의 낡은 캐시를 삭제하여 앱을 최신 상태로 유지합니다.
+// 새로운 버전의 서비스 워커가 활성화되면,
+// 이전 버전의 낡은 캐시를 삭제하고 즉시 모든 클라이언트의 제어권을 가져옵니다.
 self.addEventListener('activate', event => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
@@ -66,6 +68,9 @@ self.addEventListener('activate', event => {
           }
         })
       );
+    }).then(() => {
+      console.log('New service worker activated, claiming clients.');
+      return self.clients.claim(); // 활성화된 서비스 워커가 즉시 페이지를 제어하도록 합니다.
     })
   );
 });
