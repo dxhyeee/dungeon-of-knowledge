@@ -1,5 +1,8 @@
 
-@import url('https://webfontworld.github.io/DungGeunMo/DungGeunMo.css');
+@font-face {
+    font-family: 'DungGeunMo';
+    src: url('./neodgm.woff2') format('woff2'); /* <--- 이 부분을 실제 파일명에 맞게 수정했습니다 */
+}
 :root {
   --primary-color: #6a11cb;
   --secondary-color: #2575fc;
