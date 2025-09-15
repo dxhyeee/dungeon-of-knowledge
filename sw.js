@@ -1,5 +1,5 @@
 // 서비스 워커 버전 및 캐시할 파일 목록 정의
-const CACHE_NAME = 'dungeon-of-knowledge-cache-v3';
+const CACHE_NAME = 'dungeon-of-knowledge-cache-v4';
 const urlsToCache = [
   './',
   './index.html',
@@ -70,6 +70,7 @@ self.addEventListener('activate', event => {
       );
     }).then(() => {
       console.log('New service worker activated, claiming clients.');
+      self.skipWaiting(); // Force activation.
       return self.clients.claim(); // 활성화된 서비스 워커가 즉시 페이지를 제어하도록 합니다.
     })
   );
