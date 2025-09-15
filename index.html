@@ -9,6 +9,28 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Gugi&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="index.css" />
+    <style>
+      /* Initial loader styles to prevent flash of unstyled content */
+      body {
+        margin: 0;
+        background: linear-gradient(45deg, #6a11cb, #2575fc);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+      .initial-loader {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #33335a; /* --xp-bar-background */
+        border-top-color: #00ffdd; /* --accent-color */
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
   <script type="importmap">
 {
   "imports": {
@@ -36,7 +58,7 @@
     <link rel="manifest" href="manifest.json">
 </head>
   <body>
-    <div id="root">앱을 불러오는 중입니다... 잠시만 기다려주세요.</div>
+    <div id="root"><div class="initial-loader"></div></div>
     <script type="text/babel" data-type="module" data-presets="react,typescript" src="index.tsx"></script>
   </body>
 </html>
