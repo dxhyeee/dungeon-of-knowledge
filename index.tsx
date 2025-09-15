@@ -1211,7 +1211,7 @@ const App = () => {
       
       try {
           const [recordRes, claimsRes, chatRes] = await Promise.all([
-              pb.collection('daily_records').getList<DailyRecord>(1, 1, { filter: `user = "${loggedInUser.id}" && date >= "${todayStr} 00:00:00" && date <= "${todayStr} 23:59:59"` }),
+              pb.collection('daily_records').getList<DailyRecord>(1, 1, { filter: `user = "${loggedInUser.id}" && date ~ "${todayStr}"` }),
               pb.collection('mission_claims').getFullList<MissionClaim>({ filter: `user = "${loggedInUser.id}" && date >= "${mondayStr}"` }),
               pb.collection('ai_chats').getList<AIChat>(1, 1, { filter: `user = "${loggedInUser.id}"` })
           ]);
@@ -1242,7 +1242,7 @@ const App = () => {
         let [profilesRes, classesRes, dailyRecordsRes, postsRes] = await Promise.all([
           pb.collection('profiles').getFullList<Profile>(),
           pb.collection('classes').getFullList<Class>(),
-          pb.collection('daily_records').getFullList<DailyRecord>({ filter: `date >= "${today} 00:00:00" && date <= "${today} 23:59:59"` }),
+          pb.collection('daily_records').getFullList<DailyRecord>({ filter: `date ~ "${today}"` }),
           pb.collection('community_posts').getFullList<CommunityPost>({ sort: '-created' })
         ]);
         
