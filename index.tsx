@@ -387,16 +387,23 @@ const ClassDetailView = ({ user, classData, profiles, onBack, onUpdateProfile, .
             const monday = new Date(today);
             monday.setDate(today.getDate() - diffToMonday);
             monday.setHours(0,0,0,0);
-            const mondayStr = `${monday.getFullYear()}-${(monday.getMonth() + 1).toString().padStart(2, '0')}-${monday.getDate().toString().padStart(2, '0')}`;
-            const todayStr = getTodayDateString();
+
+            const startOfToday = new Date();
+            startOfToday.setHours(0,0,0,0);
+            const endOfToday = new Date();
+            endOfToday.setHours(23,59,59,999);
             
-            const filter = `(${classMembers.map(m => `user = "${m.id}"`).join(' || ')}) && date >= "${mondayStr} 00:00:00"`;
+            const filter = `(${classMembers.map(m => `user = "${m.id}"`).join(' || ')}) && date >= "${monday.toISOString()}"`;
             const allWeeklyRecords = await pb.collection('daily_records').getFullList<DailyRecord>({ filter });
 
             const membersWithTime = classMembers.map(member => {
                 const memberRecords = allWeeklyRecords.filter(r => r.user === member.id);
                 
-                const todayRecord = memberRecords.find(r => r.date.startsWith(todayStr));
+                const todayRecord = memberRecords.find(r => {
+                    const recordDate = new Date(r.date);
+                    return recordDate >= startOfToday && recordDate <= endOfToday;
+                });
+
                 let todaysTime = todayRecord ? todayRecord.dailyTime : 0;
                 
                 let weeklyTime = memberRecords.reduce((sum, record) => sum + record.dailyTime, 0);
@@ -567,12 +574,9 @@ const StudyCalendar = ({ user, onBack }: { user: Profile; onBack: () => void; })
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
 
-            const firstDayStr = `${firstDay.getFullYear()}-${(firstDay.getMonth() + 1).toString().padStart(2, '0')}-${firstDay.getDate().toString().padStart(2, '0')}`;
-            const lastDayStr = `${lastDay.getFullYear()}-${(lastDay.getMonth() + 1).toString().padStart(2, '0')}-${lastDay.getDate().toString().padStart(2, '0')}`;
-
             try {
                 const dailyRecords = await pb.collection('daily_records').getFullList<DailyRecord>({
-                    filter: `user = "${user.id}" && date >= "${firstDayStr}" && date <= "${lastDayStr}"`,
+                    filter: `user = "${user.id}" && date >= "${firstDay.toISOString()}" && date <= "${lastDay.toISOString()}"`,
                 });
                 
                 const recordsMap = dailyRecords.reduce((acc, record) => {
@@ -999,18 +1003,23 @@ const Dashboard = ({ user, profiles, classes, dailyRecord, missionClaims, aiChat
                 const monday = new Date(today);
                 monday.setDate(today.getDate() - diffToMonday);
                 monday.setHours(0, 0, 0, 0);
-                
-                const mondayStr = `${monday.getFullYear()}-${(monday.getMonth() + 1).toString().padStart(2, '0')}-${monday.getDate().toString().padStart(2, '0')}`;
 
                 try {
                     const records = await pb.collection('daily_records').getFullList<DailyRecord>({
-                        filter: `user = "${user.id}" && date >= "${mondayStr} 00:00:00"`
+                        filter: `user = "${user.id}" && date >= "${monday.toISOString()}"`
                     });
                     const total = records.reduce((sum, record) => sum + record.dailyTime, 0);
                     setWeeklyTotalTime(total);
 
-                    const todayStr = getTodayDateString();
-                    const recordsFromOtherDays = records.filter(r => !r.date.startsWith(todayStr));
+                    const startOfToday = new Date();
+                    startOfToday.setHours(0,0,0,0);
+                    const endOfToday = new Date();
+                    endOfToday.setHours(23,59,59,999);
+                    
+                    const recordsFromOtherDays = records.filter(r => {
+                      const recordDate = new Date(r.date);
+                      return recordDate < startOfToday;
+                    });
                     
                     const dailyTimesByDate = recordsFromOtherDays.reduce((acc, record) => {
                         const dateKey = record.date.substring(0, 10);
@@ -1113,8 +1122,14 @@ const Dashboard = ({ user, profiles, classes, dailyRecord, missionClaims, aiChat
     };
     
     const dailyMissionClaims = useMemo(() => {
-        const today = getTodayDateString();
-        return missionClaims.filter(claim => claim.date.startsWith(today));
+        const startOfToday = new Date();
+        startOfToday.setHours(0,0,0,0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23,59,59,999);
+        return missionClaims.filter(claim => {
+            const claimDate = new Date(claim.date);
+            return claimDate >= startOfToday && claimDate <= endOfToday;
+        });
     }, [missionClaims]);
 
     const timerProps = { dailyTime, sessionTime, isTimerRunning, onTimerToggle: handleTimerToggle };
@@ -1200,19 +1215,22 @@ const App = () => {
   }, [user]);
 
   const fetchUserData = useCallback(async (loggedInUser: Profile) => {
-      const todayStr = getTodayDateString();
-      const today = new Date(todayStr);
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const endOfToday = new Date();
+      endOfToday.setHours(23, 59, 59, 999);
 
+      const today = new Date();
       const dayOfWeek = today.getDay(); // Sunday = 0
       const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
       const monday = new Date(today);
       monday.setDate(today.getDate() - diffToMonday);
-      const mondayStr = `${monday.getFullYear()}-${(monday.getMonth() + 1).toString().padStart(2, '0')}-${monday.getDate().toString().padStart(2, '0')}`;
+      monday.setHours(0, 0, 0, 0);
       
       try {
           const [recordRes, claimsRes, chatRes] = await Promise.all([
-              pb.collection('daily_records').getList<DailyRecord>(1, 1, { filter: `user = "${loggedInUser.id}" && date ~ "${todayStr}"` }),
-              pb.collection('mission_claims').getFullList<MissionClaim>({ filter: `user = "${loggedInUser.id}" && date >= "${mondayStr}"` }),
+              pb.collection('daily_records').getList<DailyRecord>(1, 1, { filter: `user = "${loggedInUser.id}" && date >= "${startOfToday.toISOString()}" && date <= "${endOfToday.toISOString()}"` }),
+              pb.collection('mission_claims').getFullList<MissionClaim>({ filter: `user = "${loggedInUser.id}" && date >= "${monday.toISOString()}"` }),
               pb.collection('ai_chats').getList<AIChat>(1, 1, { filter: `user = "${loggedInUser.id}"` })
           ]);
           setDailyRecord(recordRes.items[0] || null);
@@ -1238,11 +1256,15 @@ const App = () => {
       setError(null);
       try {
         await pb.health.check();
-        const today = getTodayDateString();
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date();
+        endOfDay.setHours(23, 59, 59, 999);
+        
         let [profilesRes, classesRes, dailyRecordsRes, postsRes] = await Promise.all([
           pb.collection('profiles').getFullList<Profile>(),
           pb.collection('classes').getFullList<Class>(),
-          pb.collection('daily_records').getFullList<DailyRecord>({ filter: `date ~ "${today}"` }),
+          pb.collection('daily_records').getFullList<DailyRecord>({ filter: `date >= "${startOfDay.toISOString()}" && date <= "${endOfDay.toISOString()}"` }),
           pb.collection('community_posts').getFullList<CommunityPost>({ sort: '-created' })
         ]);
         
@@ -1314,8 +1336,13 @@ const App = () => {
     pb.collection('profiles').subscribe<Profile>('*', (e) => setProfiles(prev => e.action === 'delete' ? prev.filter(p => p.id !== e.record.id) : [...prev.filter(p => p.id !== e.record.id), e.record]));
     pb.collection('classes').subscribe<Class>('*', (e) => setClasses(prev => e.action === 'delete' ? prev.filter(c => c.id !== e.record.id) : [...prev.filter(c => c.id !== e.record.id), e.record]));
     pb.collection('daily_records').subscribe<DailyRecord>('*', (e) => {
-        const today = getTodayDateString();
-        if (!e.record.date.startsWith(today)) return; // Use startsWith to be safe with timezones
+        const recordDate = new Date(e.record.date);
+        const todayStart = new Date();
+        todayStart.setHours(0, 0, 0, 0);
+        const todayEnd = new Date();
+        todayEnd.setHours(23, 59, 59, 999);
+        if (!(recordDate >= todayStart && recordDate <= todayEnd)) return;
+
         setAllDailyRecords(prev => {
             const filtered = prev.filter(r => r.id !== e.record.id);
             return e.action === 'delete' ? filtered : [...filtered, e.record];
@@ -1455,13 +1482,12 @@ const App = () => {
 
   const handleUpdateDailyRecord = async (updates: Partial<Omit<DailyRecord, 'id' | 'user' | 'date'>>) => {
       if (!user) return;
-      const today = getTodayDateString();
       try {
           if (dailyRecord) {
               const updatedRecord = await pb.collection('daily_records').update<DailyRecord>(dailyRecord.id, updates);
               setDailyRecord(updatedRecord);
           } else {
-              const newRecordData = { user: user.id, date: today, dailyTime: 0, maxSessionTime: 0, morningStudyTime: 0, nightStudyTime: 0, ...updates };
+              const newRecordData = { user: user.id, date: new Date().toISOString(), dailyTime: 0, maxSessionTime: 0, morningStudyTime: 0, nightStudyTime: 0, ...updates };
               const newRecord = await pb.collection('daily_records').create<DailyRecord>(newRecordData);
               setDailyRecord(newRecord);
           }
@@ -1471,7 +1497,7 @@ const App = () => {
   const handleClaimMissionReward = async (mission: Mission) => {
       if (!user) return;
       try {
-          const newClaim = await pb.collection('mission_claims').create<MissionClaim>({ user: user.id, date: getTodayDateString(), missionId: mission.id });
+          const newClaim = await pb.collection('mission_claims').create<MissionClaim>({ user: user.id, date: new Date().toISOString(), missionId: mission.id });
           setMissionClaims(prev => [...prev, newClaim]);
       } catch(error) { console.error("Failed to claim mission:", error); }
   };
