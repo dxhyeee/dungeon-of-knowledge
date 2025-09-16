@@ -4,9 +4,18 @@ import { GoogleGenAI, Chat } from '@google/genai';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 
 // --- PocketBase 설정 ---
-// 🚀 여기에 Railway에서 만든 나만의 PocketBase 서버 주소를 붙여넣으세요!
 const POCKETBASE_URL = 'https://pocketbase-production-15bd.up.railway.app'; 
+
+// --- 디버깅 코드 추가 ---
+console.log("PocketBase 접속 주소:", POCKETBASE_URL);
+console.log("Google AI API 키:", process.env.API_KEY);
+// --- 디버깅 코드 끝 ---
+
 const pb = new PocketBase(POCKETBASE_URL);
+
+// --- CONSTANTS ---
+// ... 이 아래는 기존 코드 그대로 ...
+
 
 // --- CONSTANTS ---
 const SECONDS_PER_EXP = 1800;
