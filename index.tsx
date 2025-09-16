@@ -4,22 +4,9 @@ import { GoogleGenAI, Chat } from '@google/genai';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 
 // --- PocketBase 설정 ---
-const POCKETBASE_URL = 'https://pocketbase-production-15bd.up.railway.app';
-let pb;
-try {
-    console.log("PocketBase 초기화를 시도합니다...");
-    pb = new PocketBase(POCKETBASE_URL);
-    console.log("PocketBase 초기화 성공!");
-} catch (error) {
-    console.error("PocketBase 초기화 중 심각한 오류 발생:", error);
-}
-
-// --- CONSTANTS ---
-// 이 아래 부분은 기존 코드와 동일하게 그대로 두세요.
-const SECONDS_PER_EXP = 1800;
-// ...
-
-
+// 🚀 여기에 Railway에서 만든 나만의 PocketBase 서버 주소를 붙여넣으세요!
+const POCKETBASE_URL = 'https://pocketbase-production-15bd.up.railway.app'; 
+const pb = new PocketBase(POCKETBASE_URL);
 
 // --- CONSTANTS ---
 const SECONDS_PER_EXP = 1800;
@@ -445,7 +432,7 @@ const ClassDetailView = ({ user, classData, profiles, onBack, onUpdateProfile, .
     const sortedMembers = useMemo(() => {
         return [...members].sort((a, b) => {
             if (rankingPeriod === 'today') return b.todaysTime - a.todaysTime;
-            return b.weeklyTime - a.weeklyTime;
+            return b.weeklyTime - a.todaysTime;
         });
     }, [members, rankingPeriod]);
 
@@ -852,7 +839,7 @@ const AICounselor = ({ user, aiChat, onUpdateChat }: { user: Profile; aiChat: AI
         finalHistory[finalHistory.length - 1].text = modelResponse;
         onUpdateChat([...finalHistory]);
       }
-    } catch (error).
+    } catch (error) {
       console.error("AI 응답 오류:", error);
       const errorHistory = [...newHistory, { role: 'model' as const, text: '죄송합니다, 답변을 생성하는 중 오류가 발생했습니다.' }];
       onUpdateChat(errorHistory);
