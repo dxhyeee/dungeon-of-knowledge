@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createRoot } from 'react-dom/client';
 import { GoogleGenAI, Chat } from '@google/genai';
@@ -17,7 +15,7 @@ const EXP_PER_LEVEL = 5;
 const STUDY_QUOTES = [
     "성공의 비결은 시작하는 것이다.", "오늘의 노력이 내일의 너를 만든다.", "포기하지 않는 한, 실패는 없다.",
     "가장 큰 위험은 아무런 위험도 감수하지 않는 것이다.", "배움은 끝이 없는 여정이다.", "꿈을 향한 작은 발걸음이 역사를 만든다.",
-    "지식에 대한 투자는 최고의 이자를 지불한다.", "성공은 우연이 아니라, 노력과 끈기의 결과다.", "도전하지 않으면 한계도 알 수 없다.", 
+    "지식에 대한 투자는 최고의 이자를 지불한다.", "성공은 우연이 아니라, 노력과 끈기의 결과다.", "도전하지 않으면 한계도 알 수 없다.",
     "작은 습관이 큰 차이를 만든다.", "끝까지 해낸 사람이 결국 승리한다."
 ];
 
@@ -1557,7 +1555,7 @@ const App = () => {
     switch(currentPage) {
         case 'profile': return user && <Profile user={user} onBack={() => setCurrentPage('dashboard')} onUpdateCharacter={handleUpdateCharacter} onNavigateToCalendar={() => setCurrentPage('calendar')} />;
         case 'calendar': return user && <StudyCalendar user={user} onBack={() => setCurrentPage('profile')} />;
-        case 'dashboard': return user && <Dashboard user={user} profiles={profiles} classes={classes} dailyRecord={dailyRecord} missionClaims={missionClaims} aiChat={aiChat} allDailyRecords={allDailyRecords} communityPosts={communityPosts} onUpdateClassTime={handleUpdateClassTime} onUpdateUserTotalTime={handleUpdateUserTotalTime} onLogout={handleLogout} onNavigateToProfile={() => setCurrentPage('profile')} onUpdateClassProfile={handleUpdateClassProfile} onUpdateUserProfile={handleUpdateUserProfile} onUpdateDailyRecord={handleUpdateDailyRecord} onClaimMissionReward={handleClaimMissionReward} onUpdateChat={handleUpdateChat} onCreatePost={handleCreatePost} onDeletePost={handleDeletePost} />;
+        case 'dashboard': return user && <Dashboard user={user} profiles={profiles} classes={classes} dailyRecord={dailyRecord} missionClaims={missionClaims} aiChat={aiChat} allDailyRecords={allDailyRecords} communityPosts={communityPosts} onUpdateClassTime={handleUpdateClassTime} onUpdateUserTotalTime={handleUpdateUserTotalTime} onLogout={handleLogout} onNavigateToProfile={() => setCurrentPage('profile')} onUpdateClassProfile={handleUpdateClassProfile} onUpdateUserProfile={handleUpdateUserProfile} onUpdateDailyRecord={handleUpdateDailyRecord} onClaimMissionReward={handleClaimMissionReward} onUpdateChat={handleUpdateChat} onCreatePost={handleCreatePost} onDeletePost={onDeletePost} />;
         case 'login': default: return <Login onLogin={handleLogin} profiles={profiles} onDeleteProfile={handleDeleteProfile} error={loginError} />;
     }
   };
