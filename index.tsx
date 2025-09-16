@@ -839,7 +839,7 @@ const AICounselor = ({ user, aiChat, onUpdateChat }: { user: Profile; aiChat: AI
         finalHistory[finalHistory.length - 1].text = modelResponse;
         onUpdateChat([...finalHistory]);
       }
-    } catch (error) {
+    } catch (error).
       console.error("AI 응답 오류:", error);
       const errorHistory = [...newHistory, { role: 'model' as const, text: '죄송합니다, 답변을 생성하는 중 오류가 발생했습니다.' }];
       onUpdateChat(errorHistory);
@@ -1555,7 +1555,7 @@ const App = () => {
     switch(currentPage) {
         case 'profile': return user && <Profile user={user} onBack={() => setCurrentPage('dashboard')} onUpdateCharacter={handleUpdateCharacter} onNavigateToCalendar={() => setCurrentPage('calendar')} />;
         case 'calendar': return user && <StudyCalendar user={user} onBack={() => setCurrentPage('profile')} />;
-        case 'dashboard': return user && <Dashboard user={user} profiles={profiles} classes={classes} dailyRecord={dailyRecord} missionClaims={missionClaims} aiChat={aiChat} allDailyRecords={allDailyRecords} communityPosts={communityPosts} onUpdateClassTime={handleUpdateClassTime} onUpdateUserTotalTime={handleUpdateUserTotalTime} onLogout={handleLogout} onNavigateToProfile={() => setCurrentPage('profile')} onUpdateClassProfile={handleUpdateClassProfile} onUpdateUserProfile={handleUpdateUserProfile} onUpdateDailyRecord={handleUpdateDailyRecord} onClaimMissionReward={handleClaimMissionReward} onUpdateChat={handleUpdateChat} onCreatePost={handleCreatePost} onDeletePost={onDeletePost} />;
+        case 'dashboard': return user && <Dashboard user={user} profiles={profiles} classes={classes} dailyRecord={dailyRecord} missionClaims={missionClaims} aiChat={aiChat} allDailyRecords={allDailyRecords} communityPosts={communityPosts} onUpdateClassTime={handleUpdateClassTime} onUpdateUserTotalTime={handleUpdateUserTotalTime} onLogout={handleLogout} onNavigateToProfile={() => setCurrentPage('profile')} onUpdateClassProfile={handleUpdateClassProfile} onUpdateUserProfile={handleUpdateUserProfile} onUpdateDailyRecord={handleUpdateDailyRecord} onClaimMissionReward={handleClaimMissionReward} onUpdateChat={handleUpdateChat} onCreatePost={handleCreatePost} onDeletePost={handleDeletePost} />;
         case 'login': default: return <Login onLogin={handleLogin} profiles={profiles} onDeleteProfile={handleDeleteProfile} error={loginError} />;
     }
   };
