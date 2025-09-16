@@ -4,17 +4,21 @@ import { GoogleGenAI, Chat } from '@google/genai';
 import PocketBase, { ClientResponseError } from 'pocketbase';
 
 // --- PocketBase 설정 ---
-const POCKETBASE_URL = 'https://pocketbase-production-15bd.up.railway.app'; 
-
-// --- 디버깅 코드 추가 ---
-console.log("PocketBase 접속 주소:", POCKETBASE_URL);
-console.log("Google AI API 키:", process.env.API_KEY);
-// --- 디버깅 코드 끝 ---
-
-const pb = new PocketBase(POCKETBASE_URL);
+const POCKETBASE_URL = 'https://pocketbase-production-15bd.up.railway.app';
+let pb;
+try {
+    console.log("PocketBase 초기화를 시도합니다...");
+    pb = new PocketBase(POCKETBASE_URL);
+    console.log("PocketBase 초기화 성공!");
+} catch (error) {
+    console.error("PocketBase 초기화 중 심각한 오류 발생:", error);
+}
 
 // --- CONSTANTS ---
-// ... 이 아래는 기존 코드 그대로 ...
+// 이 아래 부분은 기존 코드와 동일하게 그대로 두세요.
+const SECONDS_PER_EXP = 1800;
+// ...
+
 
 
 // --- CONSTANTS ---
